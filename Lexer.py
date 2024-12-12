@@ -7,6 +7,13 @@ class Lexer:
         self.index: int = 0
         self.char: str = ''
         self.tokens: list[Token] = []
+
+    #Creates function to read word by word
+    def append_word(self) -> None:
+        with open(self.script, 'r') as script:
+            for line in script:
+                for word in line.split():
+                    self.tokens.append(word)
     
     #Create function to progress character
     def advance(self) -> None:
