@@ -14,29 +14,29 @@ class Lexer:
             for line in script:
                 for word in line.split():
                     self.tokens.append(word)
-    
-    #Create function to progress character
-    def advance(self) -> None:
-        self.char = self.script[self.index]
-        self.index += 1
-        
-    
-    #Add token to self.tokens
-    def add_token(self, char: str) -> None:
-        #Spaces aren't required as tokens so do not get added to self.tokens
-        if char != ' ':
-            self.tokens.append(char)
-        else:
-            pass
-    
-    #Clear original self.char from list - to be removed when alternative method found
-    def remove_original(self) -> None:
-        self.tokens.pop(0)
 
-    #Read self.script and append self.tokens for each char
-    def read_script(self) -> None:
-        self.tokens.append(self.char)
-        while self.index < len(self.script):
-            self.advance()
-            self.add_token(self.char)
-        self.remove_original()
+    #Cleanse self.tokens to ensure characters are separated from keywords
+    def cleanse(self) -> None:
+        letters: str = 'abcdefghijklmnopqrstuvwxyz'
+        new_tokens = []  # Temporary list to hold tokens in correct order
+
+        for token in self.tokens:
+            current_token = ''  # To build valid parts of the token
+            for char in token:
+                if char.lower() in letters:  # Check if the character is alphabetic
+                    current_token += char  # Add to the current valid token
+                else:
+                    if current_token:  # If there's a valid token fragment, save it
+                        new_tokens.append(current_token)
+                        current_token = ''  # Reset the current token
+                    new_tokens.append(char)  # Add the non-alphabetic character as its own token
+            if current_token:  # Append any remaining valid token fragment
+                new_tokens.append(current_token)
+
+        self.tokens = new_tokens  # Update the tokens with the newly constructed list
+
+    #Read script and append tokens correctly, then cleanse and return self.tokens
+    def read_script(self) -> list[Token]:
+        self.append_word()
+        self.cleanse()
+        return self.tokens
